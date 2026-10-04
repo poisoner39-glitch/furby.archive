@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#684a91">
+<title>Furby Archive</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+:root{color-scheme:light;--purple:#684a91;--pale:#eee6f7;--ink:#30263b;--muted:#756b80;--line:#e6dfeb;--bg:#faf8fc}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:760px;margin:auto;padding:16px 14px 40px}.hero{background:linear-gradient(135deg,#684a91,#9272b4);color:white;padding:22px;border-radius:22px;margin:4px 0 16px}
+h1{font-size:25px;margin:0 0 5px}.sub{color:#eee5f7;font-size:13px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}.stat{background:#ffffff20;border-radius:13px;padding:10px}.stat b{display:block;font-size:24px}.stat span{font-size:12px;color:#eee5f7}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}.tabs button{background:#eee8f5;color:var(--purple)}button,.button{border:0;border-radius:12px;padding:12px 14px;background:var(--purple);color:white;font-weight:650;font-size:14px;cursor:pointer}.tabs button.active{background:var(--purple);color:white}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.controls input{flex:1;min-width:150px}
+input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink);font:inherit}label{display:block;font-size:13px;font-weight:650;margin:9px 0 5px}.form,.item,.empty,.statsbox{background:white;border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0}.form h2,.sectiontitle{font-size:18px;margin:4px 0 12px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}.full{grid-column:1/-1}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.secondary{background:#eee8f5;color:var(--purple)}.danger{background:#fbe9ed;color:#9d3046}.itemhead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.item h3{margin:0;font-size:18px}.muted{color:var(--muted);font-size:13px}.pill{background:var(--pale);color:var(--purple);border-radius:20px;padding:5px 9px;font-size:11px;font-weight:700;white-space:nowrap}.photo{width:100%;max-height:220px;object-fit:contain;background:#f5f1f8;border-radius:10px;margin:10px 0}.item p{margin:8px 0}.empty{text-align:center;padding:28px;color:var(--muted)}.statsbox{display:grid;grid-template-columns:1fr 1fr;gap:10px}.statsbox div{background:#f7f3fa;border-radius:12px;padding:12px}.statsbox b{font-size:21px;display:block}.small{font-size:12px;color:var(--muted);line-height:1.5}.hidden{display:none!important}
+@media(max-width:480px){main{padding:10px}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.hero{padding:18px}.actions button{flex:1}}
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+<h1>🐣 FURBY ARCHIVE</h1><div class="sub">Your personal Furby collection catalogue</div>
+<div class="stats">
+<div class="stat"><b id="countOwned">0</b><span>Collected</span></div>
+<div class="stat"><b id="countWish">0</b><span>Wishlist</span></div>
+<div class="stat"><b id="countWorking">0</b><span>Working</span></div>
+</div></header>
+<div class="tabs"><button id="ownedTab" class="active">📚 Collection</button><button id="wishTab">💜 Wishlist</button></div>
+<button id="addBtn" style="width:100%">＋ Add a Furby</button>
+<section id="editor" class="form hidden">
+<h2 id="formTitle">Add a Furby</h2>
+<div class="formgrid">
+<div class="full"><label for="name">Name *</label><input id="name" placeholder="e.g. Pickles" required></div>
+<div><label for="model">Model</label><select id="model"></select></div>
+<div><label for="colour">Colour / edition</label><input id="colour" placeholder="Teal, pink, Furbacca..."></div>
+<div class="full"><label for="photo">Photo URL (optional)</label><input id="photo" type="url" placeholder="https://..."></div>
+<div><label for="date">Purchase date</label><input id="date" type="date"></div>
+<div><label for="price">Purchase price (£)</label><input id="price" type="number" min="0" step="0.01" placeholder="25.00"></div>
+<div><label for="rarity">Rarity</label><select id="rarity"><option>Common</option><option>Uncommon</option><option>Rare</option><option>Very Rare</option><option>Extremely Rare</option></select></div>
+<div><label for="condition">Condition</label><select id="condition"><option>Working</option><option>Partially working</option><option>Not working</option><option>Untested</option></select></div>
+<div class="full"><label for="notes">Notes</label><textarea id="notes" rows="3" placeholder="Accessories, special features, where you found it..."></textarea></div>
+</div>
+<div class="actions"><button id="saveBtn">Save Furby</button><button id="cancelBtn" class="secondary">Cancel</button></div>
+</section>
+<div class="controls"><input id="search" placeholder="Search your Furbies..."><select id="filter" style="max-width:190px"><option value="All">All models</option></select></div>
+<div id="list"></div>
+<h2 class="sectiontitle">📊 Collection statistics</h2>
+<div class="statsbox">
+<div><b id="statTotal">0</b><span class="muted">Furbies collected</span></div>
+<div><b id="statRare">0</b><span class="muted">Rare or rarer</span></div>
+<div><b id="statSpend">£0.00</b><span class="muted">Total purchase cost</span></div>
+<div><b id="statWorking">0</b><span class="muted">Working Furbies</span></div>
+</div>
+<section class="form">
+<h2>Backup your collection</h2>
+<p class="small">Your entries are saved on this device in your browser. Export a backup regularly, especially before clearing browser data or changing phones.</p>
+<div class="actions"><button id="exportBtn">Export backup</button><button id="importBtn" class="secondary">Import backup</button><input id="importFile" type="file" accept="application/json" class="hidden"></div>
+</section>
+<p class="small">Furby Archive is a personal catalogue. Rarity is your own collector rating, not an official valuation. Photos are stored as image links, not uploaded files.</p>
+</main>
+<script>
+const MODELS=["1998 Furby","Furby Baby (1999)","Emoto-Tronic Furby (2005)","Furby 2012","Furby Boom","Furby Boom Crystal","Furbacca","Furby Connect","Furby (2023)","Furblet","Other"];
+const $=id=>document.getElementById(id);
+let entries=[];let currentTab="owned";let editingId=null;
+try{entries=JSON.parse(localStorage.getItem("furbyArchiveEntries")||"[]");if(!Array.isArray(entries))entries=[]}catch(e){entries=[]}
+MODELS.forEach(m=>$("model").add(new Option(m,m)));
+function persist(){localStorage.setItem("furbyArchiveEntries",JSON.stringify(entries));render()}
+function setTab(tab){currentTab=tab;$("ownedTab").classList.toggle("active",tab==="owned");$("wishTab").classList.toggle("active",tab==="wish");$("addBtn").textContent=tab==="wish"?"＋ Add to wishlist":"＋ Add a Furby";$("editor").classList.add("hidden");render()}
+$("ownedTab").onclick=()=>setTab("owned");$("wishTab").onclick=()=>setTab("wish");
+function resetForm(){$("editor").classList.add("hidden");editingId=null;["name","colour","photo","date","price","notes"].forEach(id=>$(id).value="");$("model").value=MODELS[0];$("rarity").value="Common";$("condition").value="Working"}
+$("addBtn").onclick=()=>{resetForm();$("formTitle").textContent=currentTab==="wish"?"Add to wishlist":"Add a Furby";$("editor").classList.remove("hidden");$("name").focus()};
+$("cancelBtn").onclick=resetForm;
+$("saveBtn").onclick=()=>{
+ const name=$("name").value.trim();if(!name){$("name").focus();return}
+ const old=entries.find(x=>x.id===editingId);
+ const item={id:editingId??Date.now(),name,model:$("model").value,colour:$("colour").value.trim(),photo:$("photo").value.trim(),date:$("date").value,price:$("price").value,rarity:$("rarity").value,condition:$("condition").value,notes:$("notes").value.trim(),wanted:old?old.wanted:currentTab==="wish"};
+ if(old)entries=entries.map(x=>x.id===editingId?item:x);else entries.push(item);
+ resetForm();persist();
+};
+function edit(id){const x=entries.find(x=>x.id===id);if(!x)return;editingId=id;currentTab=x.wanted?"wish":"owned";$("ownedTab").classList.toggle("active",!x.wanted);$("wishTab").classList.toggle("active",x.wanted);$("formTitle").textContent="Edit "+x.name;
+ ["name","model","colour","photo","date","price","rarity","condition","notes"].forEach(k=>$(k).value=x[k]??"");$("editor").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})}
+function render(){
+ const owned=entries.filter(x=>!x.wanted),wish=entries.filter(x=>x.wanted);
+ $("countOwned").textContent=owned.length;$("countWish").textContent=wish.length;$("countWorking").textContent=owned.filter(x=>x.condition==="Working").length;
+ $("statTotal").textContent=owned.length;$("statRare").textContent=owned.filter(x=>["Rare","Very Rare","Extremely Rare"].includes(x.rarity)).length;
+ $("statSpend").textContent="£"+owned.reduce((a,x)=>a+(Number(x.price)||0),0).toFixed(2);$("statWorking").textContent=owned.filter(x=>x.condition==="Working").length;
+ const filter=$("filter").value;const q=$("search").value.toLowerCase();
+ const list=(currentTab==="wish"?wish:owned).filter(x=>(filter==="All"||x.model===filter)&&`${x.name} ${x.model} ${x.colour}`.toLowerCase().includes(q));
+ $("list").innerHTML="";
+ if(!list.length){$("list").innerHTML=`<div class="empty"><div style="font-size:32px">🐣</div><b>${currentTab==="wish"?"Your wishlist is empty":"No Furbies here yet"}</b><p class="small">${currentTab==="wish"?"Add Furbies you hope to find.":"Add your first Furby to start your archive."}</p></div>`;return}
+ list.forEach(x=>{
+  const card=document.createElement("article");card.className="item";
+  const head=document.createElement("div");head.className="itemhead";
+  const title=document.createElement("div");const h=document.createElement("h3");h.textContent=x.name;const sub=document.createElement("div");sub.className="muted";sub.textContent=x.model;title.append(h,sub);
+  const badge=document.createElement("span");badge.className="pill";badge.textContent=x.rarity;head.append(title,badge);card.append(head);
+  if(x.photo){const img=document.createElement("img");img.className="photo";img.src=x.photo;img.alt="Photo of "+x.name;img.onerror=()=>img.remove();card.append(img)}
+  const details=[x.colour&&"🎨 "+x.colour,!x.wanted&&"Condition: "+x.condition,x.price&&"£"+Number(x.price).toFixed(2),x.date&&"📅 "+x.date,x.notes].filter(Boolean);
+  details.forEach(t=>{const p=document.createElement("p");p.textContent=t;card.append(p)});
+  const actions=document.createElement("div");actions.className="actions";
+  const make=(label,cls,fn)=>{const b=document.createElement("button");b.textContent=label;b.className=cls;b.onclick=fn;actions.append(b)};
+  make("Edit","secondary",()=>edit(x.id));
+  make(x.wanted?"✓ I got it!":"♡ Wishlist","secondary",()=>{x.wanted=!x.wanted;if(!x.wanted)x.condition="Untested";persist()});
+  make("Delete","danger",()=>{if(confirm("Remove "+x.name+" from your archive?")){entries=entries.filter(y=>y.id!==x.id);persist()}});
+  card.append(actions);$("list").append(card);
+ });
+}
+$("search").oninput=render;$("filter").onchange=render;
+MODELS.forEach(m=>$("filter").add(new Option(m,m)));
+$("exportBtn").onclick=()=>{const blob=new Blob([JSON.stringify(entries,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="furby-archive-backup.json";a.click();URL.revokeObjectURL(a.href)};
+$("importBtn").onclick=()=>$("importFile").click();
+$("importFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data))throw Error();if(confirm("Replace your current archive with this backup?")){entries=data;persist();alert("Backup imported!")}}catch(err){alert("That file doesn't look like a Furby Archive backup.")}e.target.value=""};
+render();
+if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("./sw.js").catch(()=>{});
+</script>
+</body></html>

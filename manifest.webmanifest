@@ -1,0 +1,13 @@
+{
+  "name": "Furby Archive",
+  "short_name": "Furby Archive",
+  "description": "Your personal Furby collection catalogue",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#faf8fc",
+  "theme_color": "#684a91",
+  "icons": [
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
